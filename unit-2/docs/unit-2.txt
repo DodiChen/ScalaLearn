@@ -1,0 +1,109 @@
+Scala 编程学习
+
+#第二章
+
+&&1	变量定义
+val  类似于final，一旦被初始化，无法再被赋值
+var   非final变量，可以在生命周期中被多次赋值
+
+val msg = "Hello World";
+scala 会自动进行  类型推断
+
+val msg2: java.lang.String = "Hello again, world"
+val msg3: String = "Hello again, world"
+
+&&2	函数定义
+def max(x: Int, y: Int) : Int = {
+	if(x > y) x
+	else y
+}
+
+函数定义以def开始然后是函数名，括号里带有冒号分割的函数列表，函数的每个参数都必须带有前缀冒号的类型标注， 这之后的  ：type 是函数的结果类型。 ={} 函数体的内容
+
+既不带参数也不返回结果的函数
+
+def greet() = {println("Hello world")}
+
+暂定 将Util的返回类型当做是 void
+
+退出scala 编译器：    :q 或  :quit
+
+
+&&3 编写scala脚本
+把println("Hello world, from a script"); 放到 hello.scala 脚本里面去
+在dos 命令行中直接运行   scala hello.scala
+
+scala 脚本的命令行参数保存在名为args 的Scala数组中，数组从0开始，可以通过在括号里指定
+scala hello2.scala test
+
+注释(跟java的注释方法一致)：
+//
+/**/
+
+&&4 用while做循环，用if做判断
+while(condition){
+	// 代码块
+}
+
+scala printargs.scala Scala is fun
+
+&&5 使用foreach 和 for 做枚举
+
+while是指令式编程
+函数式变成的主要特征之一就是，函数是头等结构，而这正是Scala的主要特性
+args.foreach(arg => println(arg))
+这段代码对args调用了foreach方法，并把函数作为参数传入，在这里是名为arg的函数字面量(function literal)，函数体是println.
+
+scala 编译器会自动推断args的类型是string，也可以给arg加上类型名
+args.foreach((arg : String) => println(arg))
+如果函数字面量只有一行语句并只带一个参数，那么连只带参数都不需要
+args.foreach(println)
+
+综上所述，函数字面量的语法构成包含括号以及命名参数列表，右箭头以及函数体
+(x:Int, y:Int)              =>                  x + y;
+括号内的函数参数            右箭头              函数体
+
+scala pa.scala Concise is nice
+
+Scala 中函数式的编码风格，for与之相近
+for(arg <- args)
+	println(arg)
+此处的arg 是val的类型。 所以，对于args数组的每个元素，枚举的时候都会创建并初始化新的arg值，然后调用执行for的函数体
+
+scala forargs.scala for arg in args
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
