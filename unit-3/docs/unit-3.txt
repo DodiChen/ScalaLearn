@@ -1,0 +1,145 @@
+Scala 编程学习
+
+#第三章
+
+&& 1 使用类型参数化数组
+
+Scala 使用new 实例化对象(或者叫类实例)
+实例化过程中，可以用值和类型使 对象参数化(在创建实例的同时完成对它的设置)。使用值参数化实例可以通过把值船体给构造器的圆括号来实现。
+
+val big = new java.math.BigInteger("12345");
+val greetString = new Array[String](3);
+val greetString : Array[String] = new Array[String](3);   [] 包含的是类型名
+scala的数组是通过索引值加圆括号的进行的访问，而不是方括号
+
+如果用val 定义变量，那么这个变量就不能被重新赋值，但变量指向的独享内部却仍可改变。 greetString 不能被重新赋值成别的数组，他将永远指向初始化时指定的那个Array[String]实例，但是Array[String]的内部元素始终可以被修改，因此数组本身是可变的
+
+从技术层面上来讲，scala没有操作符重载，因为他根本没有传统意义上的操作符。取而代之的是 +-*/ 这样的字符可以用来做方法名。因此 1+2 在scala里面实际上是在Int对象1 上面调用名为 + 的方法，并把2 作为参数传给他
+当然， 1+2 可以写成更传统的方式  (1).+(2)
+
+用括号传递给变量一个或多个值参数时，Scala会把它转换成对apply方法的调用。于是 greetString(i)转换成greetString.apply(i)。所以scala里访问数组元素也只不过是跟其他的一样的方法调用。
+这个原则不是只对于数组，任何对于对象的值参数应用都将被转换为对apply方法的调用。当然前提是这个类型实际定义过apply方法。这是通用法则
+与之对应的，当对带有括号并包含一到若干参数的变量赋值时，编译器将使用对象的update方法对括号里的参数和等号右边的对象执行调用
+例如:
+greetStrings(0) = "Hello" 将会变换成 greetStrings.update(0, "Helo");
+
+scala greetingString.scala
+
+Scala 还提供了更为简洁的创建和初始化数组的方法
+val numNames = Array("zero", "one", "two");
+上述语法实际上就是调用了创建并返回新数组的apply工厂方法。apply方法有不定个数的参数，定义在Array的伴生对象中。目前可以理解为调用Array类的静态方法apply
+val numNames2 = Array.apply("zero", "one", "two");
+
+
+&& 2 使用列表(List)
+
+Scala 数组是可变的同类对象序列。例如： Array[String] 的所有对象都是String，而且尽管数组在实例化之后长度固定，但它的元素值确实可变的。所以说数组是可变的。
+至于不可变的同类对象序列，Scala的列表类List才是，Scala.List 不同于java.util.List， 一旦创建了就不可改变。
+val oneTwoThree = List(1,2,3);
+对某个列表调用方法时，似乎这个列表发生了改变，而实际上只是用新的值重建了列表然后再返回。
+
+::: 叠加功能
+::  把新元素组合到现有列表的最前端
+
+如果方法使用操作符来标注，那么左操作数是方法的调用者，如果方法名以冒号结尾，那么右操作数是这个方法的调用者。
+
+因为Nil 是空列表的简写，所以可以使用cons 操作符把所有元素都串起来，并以Nil 做结尾来定义新列表
+val oneTwoThree = 1 :: 2 :: 3 :: Nil
+
+List 为什么不支持append操作
+因为随着List变长，append的耗时将呈线性增长，而是用 :: 做前缀则仅耗用固定的时间。如果想通过添加元素来构造列表，可以先把他们前缀进去，完成之后再调用reverse； 或者使用ListBuffer，一种提供append操作的可变列表，完成之后调用toList
+
+&& 3 使用元祖(Tuple)
+元祖也是很有用的容易对象，与List一样，元祖也是不可变的，但是与List不同的是，元祖可以包含不同类型的元素。
+如果需要在方法中返回多个对象，java需要创建javabean，scala 可以使用元祖。
+元祖的创建，只需要把元祖实例化需要的对象放在括号中，并用逗号分隔即可。元祖实例化之后，可以用点号，下划线和基于1 的索引访问其中的元素
+如下所示
+val pair = (99, "Luftballons")
+println(pair._1)
+println(pair._2)
+
+scala tuple.scala
+
+访问元祖的元素
+为什么不能用访问列表的方式来访问元祖，例如pair(0). 那是因为列表的apply方法始终返回同样的类型，但元组里的元素类型不尽相同。另外这些访问的索引是基于  1 的，而不是基于0， 这是类似于Haskell和ML，从1 开始是传统的设定
+
+
+&& 4 使用集(set) 和映射(map)
+scala 的集合库 区分为可变类型和不可变类型
+Scala 通过类继承的差别把可变性差异蕴含其中
+
+var jetSet = Set("Boeing", "Airbus");
+jetSet += "Lear"
+println(jetSet.contains("Lear"))
+第一行定义了名为jetSet的新变量，并初始化了包含两个字符串Boeing和Airbus的不可变集。都是调用了Set伴生对象的apply工厂方法。
+要加入新变量，可以对jetSet调用+，并传入新元素。可变的和不可变的集都提供了+方法，但结果不同。可变的把元素加入自身，不可变集则创建并返回了包含添加元素的新集。
+所以上述不可变值真正的操作方式是
+jetSet = jetSet + "Lear"
+
+如果要定义可变Set，就需要加入引用
+import scala.collection.mutable.Set
+val movieSet = Set("Hitch", "Poltergeist")
+movieSet += "Shrek"
+println(movieSet)
+因为这里的set是可变的，所以上述代码可以改成
+movieSet.+=("Sherk")
+
+
+另一种常用的集合类是Map
+import scala.collection.mutable.Map
+val treasureMap = Map[Int, String]()
+treasureMap += (1 -> "Go to island")
+treasureMap += (2 -> "Find big X on ground.")
+treasureMap += (3 -> "Dig.")
+println(treasureMap(2))
+
+scala 会把 1 -> "Go to island" 转换成 (1).->("Go to island")。因此实际上来说，是在对Int值1 调用 -> 方法，并传入参数String。 Scala 的任何对象都可以调用 -> 方法，并返回包含键值对的二元组。然后这个二元组
+被交给treasureMap对象的 += 方法
+
+
+对于不可变的Map,不必引用任何类，因为不可变Map是默认的。
+val romanNumeral = Map(
+	1 -> "I", 2 -> "II", 3 -> "III", 4 -> "IV", 5 -> "V"
+)
+println(romanNumeral(4))
+
+&& 5 学习识别函数式风格
+尝试向函数式风格转变的风格之一，就是尝试不用任何var编程
+
+识别函数是否有副作用的地方就在于其结果类型是否为Unit，如果某个函数不返回任何有用的值，也就是说返回类型为Unit，那么这个函数唯一能产生的作用只能是通过某种副作用
+
+真正的函数式风格的代码：
+不用var，没有副作用
+
+
+
+&& 6 从文件中读取文本行
+scala fileread.scala
+scala fileread2.scala
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
